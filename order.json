@@ -1,0 +1,18 @@
+{
+	"enabled": [
+		"Constants",
+		"Cache",
+		"Palette",
+		"Scene",
+		"Renderer",
+		"Camera",
+		"Loop",
+		"Session",
+		"SocketIO",
+		"RadialMenu",
+		"RadialButton",
+		"View",
+		"Controller"
+	],
+	"disabled": []
+}
