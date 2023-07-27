@@ -24,7 +24,7 @@ SocketIO.socket.on("connect", function() {
 		document.body.textContent = "start: " + x.toFixed(2) + "/" + y.toFixed(2);
 
 		pX = x;
-		pY = x;
+		pY = y;
 	});
 
 	document.documentElement.addEventListener("touchmove", function(event) {
@@ -38,7 +38,7 @@ SocketIO.socket.on("connect", function() {
 		document.body.textContent = "move: " + x.toFixed(2) + "/" + y.toFixed(2);
 
 		pX = x;
-		pY = x;
+		pY = y;
 	});
 
 	document.documentElement.addEventListener("touchend", function(event) {

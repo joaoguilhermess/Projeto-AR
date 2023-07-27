@@ -1,5 +1,15 @@
 class RadialMenu {
-	static Init() {
+	static Init(d) {
+		this.r = d/2;
+
+		this.t = 8;
+		this.t2 = 8;
+		this.t3 = this.t * this.t2;
+
+		this.a = 360/this.t3;
+
+		this.buttons = [];
+
 		this.addParent();
 
 		this.addBackground();
@@ -18,12 +28,8 @@ class RadialMenu {
 	static addBackground() {
 		var shape = new THREE.Shape();
 
-		var t = 64;
-
-		var r = 0.5/2;
-
-		for (var i = 0; i <= t; i++) {
-			shape.lineTo(Math.sin(RAD * i * 360/t) * r, Math.cos(RAD * i * 360/t) * r);
+		for (var i = 0; i <= this.t3; i++) {
+			shape.lineTo(Math.sin(RAD * i * this.a) * this.r, Math.cos(RAD * i * this.a) * this.r);
 		}
 
 		var geometry = new THREE.ShapeGeometry(shape);
@@ -40,8 +46,38 @@ class RadialMenu {
 
 		this.parent.add(mesh);
 	}
+
+	static addButton(button) {
+		button.slot = this.buttons.length;
+
+		this.buttons.push(button);
+	}
+
+	static updateCursor(angle) {
+		var slot = Math.floor(angle/(this.a * this.t));
+
+		for (var i = 0; i < this.buttons.length; i++) {
+			this.buttons[i].setHover(false);
+		}
+
+		if (this.buttons[slot]) {
+			var button = this.buttons[slot];
+
+			button.setHover(true);
+		}
+	}
+
+	static click(angle) {
+		var slot = Math.floor(angle/(this.a * this.t));
+
+		if (this.buttons[slot]) {
+			var button = this.buttons[slot];
+
+			button.toggle();
+		}
+	}
 }
 
 AR.RadialMenu = RadialMenu;
 
-RadialMenu.Init();
+RadialMenu.Init(0.5);

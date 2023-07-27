@@ -6,9 +6,11 @@ class Palette {
 	
 	static Background = 0x303030;
 	static BackgroundLight = 0x404040;
-	static BackgroundDark = 0x181818;
+	static BackgroundDark = 0x191919;
 
 	static Text = 0xdbdbdb;
+	static TextLight = 0xfbfbfb;
+	static TextDark = 0xababab;
 }
 
 window.AR.Palette = Palette;

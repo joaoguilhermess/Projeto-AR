@@ -1,16 +1,20 @@
 class RadialButton {
-	constructor(slot) {
-		this.slot = slot;
+	constructor() {
+		AR.RadialMenu.addButton(this);
 
-		this.t = 8;
-		this.t2 = 8;
+		this.t = AR.RadialMenu.t;
+		this.t2 = AR.RadialMenu.t2;
 
 		this.a = 360/this.t/this.t2;
 		
-		this.r = 0.5/2;
+		this.o = -this.t/2 + (this.t * this.slot);
+
+		this.r = AR.RadialMenu.r;
 
 		this.wB = 0.96;
 		this.wT = 0.7;
+
+		this.active = false;
 
 		this.addParent();
 
@@ -30,16 +34,14 @@ class RadialButton {
 	addBorder() {
 		var shape = new THREE.Shape();
 
-		var o = -this.t/2 + (this.t * this.slot);
-
-		shape.moveTo(Math.sin(RAD * o * this.a) * this.r * this.wB, Math.cos(RAD * o * this.a) * this.r * this.wB);
+		shape.moveTo(Math.sin(RAD * this.o * this.a) * this.r * this.wB, Math.cos(RAD * this.o * this.a) * this.r * this.wB);
 
 		for (var i = 0; i <= this.t; i++) {
-			shape.lineTo(Math.sin(RAD * (i + o) * this.a) * this.r, Math.cos(RAD * (i + o) * this.a) * this.r);
+			shape.lineTo(Math.sin(RAD * (i + this.o) * this.a) * this.r, Math.cos(RAD * (i + this.o) * this.a) * this.r);
 		}
 
 		for (var i = this.t; i >= 0; i--) {
-			shape.lineTo(Math.sin(RAD * (i + o) * this.a) * this.r * this.wB, Math.cos(RAD * (i + o) * this.a) * this.r * this.wB);
+			shape.lineTo(Math.sin(RAD * (i + this.o) * this.a) * this.r * this.wB, Math.cos(RAD * (i + this.o) * this.a) * this.r * this.wB);
 		}
 
 		var geometry = new THREE.ShapeGeometry(shape);
@@ -83,12 +85,39 @@ class RadialButton {
 		this.text.sync();
 	}
 
-	setActive(active) {
-		if (active) {
+	setHover(hover) {
+		if (hover) {
+			this.border.material.color.setHex(AR.Palette.BackgroundDark);
+			this.text.material.color.setHex(AR.Palette.TextDark);
+		} else {
+			if (this.active) {
+				this.border.material.color.setHex(AR.Palette.Primary);
+				this.text.material.color.setHex(AR.Palette.TextLight);
+			} else {
+				this.border.material.color.setHex(AR.Palette.BackgroundLight);
+				this.text.material.color.setHex(AR.Palette.Text);
+			}
+		}
+	}
+
+	toggle() {
+		this.active = !this.active;
+
+		if (this.active) {
 			this.border.material.color.setHex(AR.Palette.Primary);
+			this.text.material.color.setHex(AR.Palette.TextLight);
 		} else {
 			this.border.material.color.setHex(AR.Palette.BackgroundLight);
+			this.text.material.color.setHex(AR.Palette.Text);
 		}
+
+		if (this.callback) {
+			this.callback(this.active);
+		}
+	}
+
+	setCallback(callback) {
+		this.callback = callback;
 	}
 }
 

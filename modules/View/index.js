@@ -1,13 +1,18 @@
 class View {
 	static Init() {
-		var button = new AR.RadialButton(0);
+		var button = new AR.RadialButton();
 
 		button.setText("VIEW");
 
-		button.setActive(true);
+		button.setCallback(function(active) {
+			if (active) {
+				console.log("CUM");
+			}
+		});
 	}
 }
 
 AR.View = View;
 
+View.Init();
 View.Init();
