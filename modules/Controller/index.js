@@ -1,7 +1,7 @@
 class Controller {
 	static Init() {
 		AR.SocketIO.socket.on("controller-start", function(x, y) {
-			// console.log("start:", x, y);
+			AR.RadialMenu.toggle();
 		});
 
 		AR.SocketIO.socket.on("controller-move", function(x, y) {
@@ -22,10 +22,12 @@ class Controller {
 			}
 
 			AR.RadialMenu.click(angle);
+			
+			AR.RadialMenu.toggle();
 		});
 
 		AR.SocketIO.socket.on("controller-battery", function(level) {
-			console.log("battery:", level);
+			console.log("battery:", level * 100 + "%");
 		});
 	}
 }

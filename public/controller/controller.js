@@ -4,7 +4,16 @@ document.documentElement.addEventListener("click", function() {
 	}
 });
 
+var one = false;
+
 SocketIO.socket.on("connect", function() {	
+	if (one) {
+		return
+	} else {
+		one = true;
+	}
+
+
 	SocketIO.socket.emit("registry", "controller-start");
 	SocketIO.socket.emit("registry", "controller-move");
 	SocketIO.socket.emit("registry", "controller-end");

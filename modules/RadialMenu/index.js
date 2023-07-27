@@ -18,6 +18,8 @@ class RadialMenu {
 	static addParent() {
 		var parent = new THREE.Group();
 
+		parent.visible = false;
+
 		AR.Scene.add(parent);
 
 		parent.position.set(0, 0, -0.8);
@@ -47,6 +49,10 @@ class RadialMenu {
 		this.parent.add(mesh);
 	}
 
+	static toggle() {
+		this.parent.visible = !this.parent.visible;
+	}
+
 	static addButton(button) {
 		button.slot = this.buttons.length;
 
@@ -68,6 +74,9 @@ class RadialMenu {
 	}
 
 	static click(angle) {
+		if (!this.parent.visible) {
+			return;
+		}
 		var slot = Math.floor(angle/(this.a * this.t));
 
 		if (this.buttons[slot]) {
