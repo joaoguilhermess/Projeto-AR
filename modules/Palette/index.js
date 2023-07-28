@@ -4,8 +4,8 @@ class Palette {
 
 	static SceneBackground = 0x202020;
 	
-	static Background = 0x303030;
-	static BackgroundLight = 0x404040;
+	static Background = 0x222222;
+	static BackgroundLight = 0x303030;
 	static BackgroundDark = 0x191919;
 
 	static Text = 0xdbdbdb;

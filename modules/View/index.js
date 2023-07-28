@@ -14,13 +14,11 @@ class View {
 
 		var geometry = new THREE.PlaneGeometry(this.source.videoWidth/this.source.videoHeight * this.scale, this.scale);
 
-		var material = new THREE.MeshBasicMaterial();
-
 		var texture = new THREE.VideoTexture(this.source);
 
 		texture.encoding = THREE.sRGBEncoding;
 
-		material.map = texture;
+		var material = new THREE.MeshBasicMaterial({map: texture});
 
 		var video = new THREE.Mesh(geometry, material);
 
@@ -35,7 +33,9 @@ class View {
 		var stream = await new Promise(function(resolve, reject) {
 			navigator.getUserMedia({
 				video: {
-					facingMode: "environment"
+					facingMode: "environment",
+					height: 2160/2,
+					width: 4096/2
 				}, audio: false
 			}, resolve, reject);
 		});

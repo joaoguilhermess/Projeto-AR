@@ -1,12 +1,13 @@
 class RadialMenu {
-	static Init(d) {
-		this.r = d/2;
+	static Init() {
+		this.r = 0.5/2;
 
 		this.t = 8;
 		this.t2 = 8;
 		this.t3 = this.t * this.t2;
 
 		this.a = 360/this.t3;
+		this.o = (this.a * this.t)/2;
 
 		this.buttons = [];
 
@@ -39,7 +40,7 @@ class RadialMenu {
 		var material = new THREE.MeshBasicMaterial({
 			color: AR.Palette.Background,
 			transparent: true,
-			opacity: 0.2
+			opacity: 0.5
 		});
 
 		var mesh = new THREE.Mesh(geometry, material);
@@ -60,6 +61,12 @@ class RadialMenu {
 	}
 
 	static updateCursor(angle) {
+		angle += this.o;
+
+		if (angle > 360) {
+			angle = angle - 360;
+		}
+
 		var slot = Math.floor(angle/(this.a * this.t));
 
 		for (var i = 0; i < this.buttons.length; i++) {
@@ -77,6 +84,13 @@ class RadialMenu {
 		if (!this.parent.visible) {
 			return;
 		}
+
+		angle += this.o;
+
+		if (angle > 360) {
+			angle = angle - 360;
+		}
+
 		var slot = Math.floor(angle/(this.a * this.t));
 
 		if (this.buttons[slot]) {
@@ -89,4 +103,4 @@ class RadialMenu {
 
 AR.RadialMenu = RadialMenu;
 
-RadialMenu.Init(0.5);
+RadialMenu.Init();
