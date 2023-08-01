@@ -121,4 +121,4 @@ class RadialButton {
 	}
 }
 
-window.AR.RadialButton = RadialButton;
+AR.RadialButton = RadialButton;

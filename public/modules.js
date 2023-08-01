@@ -7,7 +7,7 @@ async function InitModules() {
 		try {
 			await import("/modules/" + list[i] + "/index.js");
 		} catch (e) {
-			e.stackTrace();
+			console.error(e);
 		}
 	}
 }

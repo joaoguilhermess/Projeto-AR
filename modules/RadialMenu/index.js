@@ -19,11 +19,11 @@ class RadialMenu {
 	static addParent() {
 		var parent = new THREE.Group();
 
-		parent.visible = false;
-
-		AR.Scene.add(parent);
+		// parent.visible = false;
 
 		parent.position.set(0, 0, -0.8);
+
+		AR.Camera.add(parent);
 
 		this.parent = parent;
 	}
@@ -40,7 +40,7 @@ class RadialMenu {
 		var material = new THREE.MeshBasicMaterial({
 			color: AR.Palette.Background,
 			transparent: true,
-			opacity: 0.5
+			opacity: 0.8
 		});
 
 		var mesh = new THREE.Mesh(geometry, material);

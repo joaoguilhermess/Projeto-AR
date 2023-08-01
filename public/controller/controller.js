@@ -1,66 +1,103 @@
-document.documentElement.addEventListener("click", function() {
-	if (!document.fullscreenElement) {
-		document.documentElement.requestFullscreen();
+class Controller {
+	static Init() {
+		this.addFullscreen();
+
+		this.addSocket();
+
+		this.addBattery();
+
+		this.addCallback();
+
+		this.shift = true;
+
+		this.toggleKeys();
 	}
-});
 
-var one = false;
-
-SocketIO.socket.on("connect", function() {	
-	if (one) {
-		return
-	} else {
-		one = true;
-	}
-
-
-	SocketIO.socket.emit("registry", "controller-start");
-	SocketIO.socket.emit("registry", "controller-move");
-	SocketIO.socket.emit("registry", "controller-end");
-	SocketIO.socket.emit("registry", "controller-battery");
-
-	var pX;
-	var pY;
-
-	document.documentElement.addEventListener("touchstart", function(event) {
-		event.preventDefault();
-
-		var y = (event.touches[0].pageY/window.innerHeight - 0.5) * 2;
-		var x = (event.touches[0].pageX/window.innerWidth - 0.5) * 2;
-
-		SocketIO.socket.emit("controller-start", x, y);
-
-		document.body.textContent = "start: " + x.toFixed(2) + "/" + y.toFixed(2);
-
-		pX = x;
-		pY = y;
-	});
-
-	document.documentElement.addEventListener("touchmove", function(event) {
-		event.preventDefault();
-
-		var y = (event.touches[0].pageY/window.innerHeight - 0.5) * 2;
-		var x = (event.touches[0].pageX/window.innerWidth - 0.5) * 2;
-
-		SocketIO.socket.emit("controller-move", x, y);
-
-		document.body.textContent = "move: " + x.toFixed(2) + "/" + y.toFixed(2);
-
-		pX = x;
-		pY = y;
-	});
-
-	document.documentElement.addEventListener("touchend", function(event) {
-		SocketIO.socket.emit("controller-end", pX, pY);
-
-		document.body.textContent = "end: " + pX.toFixed(2) + "/" + pY.toFixed(2);
-	});
-
-	navigator.getBattery().then(function(battery) {
-		SocketIO.socket.emit("controller-battery", battery.level);
-
-		battery.addEventListener("levelchange", function(event) {
-			SocketIO.socket.emit("controller-battery", battery.level);
+	static addFullscreen() {
+		document.documentElement.addEventListener("click", function() {
+			if (!document.fullscreenElement) {
+				document.documentElement.requestFullscreen();
+			}
 		});
-	});
-});
+	}
+
+	static toggleKeyboard() {
+		var keyboard = document.querySelector(".keyboard");
+
+		if (keyboard.style.display != "flex") {
+			keyboard.style.display = "flex";
+		} else {
+			keyboard.style.display = "none";
+		}
+	}
+
+	static addSocket() {
+		var one = false;
+
+		var context = this;
+
+		SocketIO.socket.on("connect", function() {
+			if (one) {
+				return
+			} else {
+				one = true;
+			}
+
+			context.toggleKeyboard();
+
+			SocketIO.socket.emit("registry", "controller-keyboard");
+			SocketIO.socket.emit("registry", "controller-battery");
+		});
+	}
+
+	static addBattery() {
+		navigator.getBattery().then(function(battery) {
+			SocketIO.socket.emit("controller-battery", battery.level);
+
+			battery.addEventListener("levelchange", function(event) {
+				SocketIO.socket.emit("controller-battery", battery.level);
+			});
+
+			setInterval(function() {
+				SocketIO.socket.emit("controller-battery", battery.level);
+			}, 1000 * 10);
+		});
+	}
+
+	static addCallback() {
+		var list = document.querySelectorAll(".key");
+
+		var context = this;
+
+		for (var i = 0; i < list.length; i++) {
+			// list[i].onclick = function(event) {
+			list[i].ontouchstart = function(event) {
+				var key = event.target.textContent;
+
+				if (key == "SHIFT") {
+					context.toggleKeys();
+				} else {
+					SocketIO.socket.emit("controller-keyboard", key);
+				}
+			};
+		}
+	}
+
+	static toggleKeys() {
+		var list = document.querySelectorAll(".key");
+
+		this.shift = !this.shift;
+
+		for (var i = 0; i < list.length; i++) {
+			if (this.shift) {
+				if (list[i].getAttribute("shift") != null) {
+					list[i].textContent = list[i].getAttribute("shift");
+				}
+			} else {
+				list[i].textContent = list[i].getAttribute("key");
+			}
+		}
+	}
+}
+
+Controller.Init();

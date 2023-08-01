@@ -1,6 +1,6 @@
 class View {
 	static Init() {
-		this.scale = 2;
+		this.scale = 2.5;
 
 		this.addButton();
 	}

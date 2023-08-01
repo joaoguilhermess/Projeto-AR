@@ -11,7 +11,11 @@
 		"SocketIO",
 		"RadialMenu",
 		"RadialButton",
+		"LeftMenu",
+		"LeftItem",
 		"View",
+		"FPS",
+		"Battery",
 		"Controller"
 	],
 	"disabled": []
