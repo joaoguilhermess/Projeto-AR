@@ -19,7 +19,7 @@ class RadialMenu {
 	static addParent() {
 		var parent = new THREE.Group();
 
-		// parent.visible = false;
+		parent.visible = false;
 
 		parent.position.set(0, 0, -0.8);
 

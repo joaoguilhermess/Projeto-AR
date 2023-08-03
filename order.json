@@ -16,7 +16,8 @@
 		"View",
 		"FPS",
 		"Battery",
-		"Controller"
+		"Controller",
+		"Proxy"
 	],
 	"disabled": []
 }

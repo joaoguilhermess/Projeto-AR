@@ -1,6 +1,5 @@
 class Palette {
-	static Primary = 0xe05858;
-	static PrimaryDark = 0xff3030;
+	static Primary = 0xd0d0d0;
 
 	static SceneBackground = 0x202020;
 	

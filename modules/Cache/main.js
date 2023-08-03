@@ -21,7 +21,9 @@ export function Init() {
 
 			stream.pipe(res);
 		} else {
-			var f = await fetch(args);
+			var c = new AbortController();
+
+			var f = await fetch(args, {signal: c.signal});
 
 			var stream = Util.writeStream(path);
 
@@ -30,6 +32,10 @@ export function Init() {
 			res.type(extension);
 
 			f.body.pipe(res);
+
+			res.on("end", function() {
+				c.abort();
+			});
 		}
 	});
 }

@@ -1,8 +1,8 @@
 class Controller {
 	static Init() {
-		this.addStart();
-		
 		this.addKeyboard();
+		
+		this.addCursor();
 
 		this.addBattery();
 	}
@@ -13,13 +13,13 @@ class Controller {
 		});
 	}
 
-	static addStart() {
+	static addCursor() {
 		AR.SocketIO.socket.on("controller-start", function(x, y) {
-			AR.RadialMenu.toggle();
+			if (Math.max(x, y) < 0.25) {
+				AR.RadialMenu.toggle();
+			}
 		});
-	}
 
-	static addMove() {
 		AR.SocketIO.socket.on("controller-move", function(x, y) {
 			var angle = Math.atan2(x, -y) / (Math.PI/180);
 
@@ -29,9 +29,7 @@ class Controller {
 
 			AR.RadialMenu.updateCursor(angle);
 		});
-	}
 
-	static addEnd() {
 		AR.SocketIO.socket.on("controller-end", function(x, y) {
 			var angle = Math.atan2(x, -y) / (Math.PI/180);
 
@@ -46,12 +44,16 @@ class Controller {
 	}
 
 	static addBattery() {
-		var item = new AR.LeftItem();
-
-		item.setTitle("Controller:");
+		var item;
 
 		AR.SocketIO.socket.on("controller-battery", function(level) {
-			item.setText(level * 100 + "%");
+			if (!item) {
+				item = new AR.LeftItem();
+
+				item.setTitle("Controller:");
+			}
+
+			item.setText(Math.round(level * 100) + "%");
 		});
 	}
 }
