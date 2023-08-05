@@ -8,39 +8,54 @@ class Controller {
 	}
 
 	static addKeyboard() {
+		var context = this;
+
 		AR.SocketIO.socket.on("controller-keyboard", function(key) {
-			console.log(key);
+			context.focus({
+				type: "key",
+				key: key
+			});
 		});
 	}
 
 	static addCursor() {
+		this.setFocus(function(...args) {AR.RadialMenu.input(...args)});
+
+		var context = this;
+
 		AR.SocketIO.socket.on("controller-start", function(x, y) {
-			if (Math.max(x, y) < 0.25) {
-				AR.RadialMenu.toggle();
-			}
+			context.focus({
+				type: "start",
+				x: x,
+				y: y
+			});
 		});
 
 		AR.SocketIO.socket.on("controller-move", function(x, y) {
-			var angle = Math.atan2(x, -y) / (Math.PI/180);
-
-			if (angle < 0) {
-				angle = 180 + angle + 180;
-			}
-
-			AR.RadialMenu.updateCursor(angle);
+			context.focus({
+				type: "move",
+				x: x,
+				y: y
+			});
 		});
 
 		AR.SocketIO.socket.on("controller-end", function(x, y) {
-			var angle = Math.atan2(x, -y) / (Math.PI/180);
+			var d = Math.sqrt(x*x + y*y);
 
-			if (angle < 0) {
-				angle = 180 + angle + 180;
+			if (d < 0.25) {
+				context.setFocus(function(...args) {AR.RadialMenu.input(...args)});
+			} else {
+				context.focus({
+					type: "end",
+					x: x,
+					y: y
+				});
 			}
-
-			AR.RadialMenu.click(angle);
-			
-			AR.RadialMenu.toggle();
 		});
+	}
+
+	static setFocus(callback) {
+		this.focus = callback;
 	}
 
 	static addBattery() {

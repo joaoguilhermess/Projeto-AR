@@ -60,43 +60,63 @@ class RadialMenu {
 		this.buttons.push(button);
 	}
 
-	static updateCursor(angle) {
-		angle += this.o;
-
-		if (angle > 360) {
-			angle = angle - 360;
+	static input(event) {
+		if (event.type == "start") {
+			this.toggle();
 		}
 
-		var slot = Math.floor(angle/(this.a * this.t));
+		if (event.type == "move") {
+			var angle = Math.atan2(event.x, -event.y) / (RAD);
 
-		for (var i = 0; i < this.buttons.length; i++) {
-			this.buttons[i].setHover(false);
+			if (angle < 0) {
+				angle = 180 + angle + 180;
+			}
+
+			angle += this.o;
+
+			if (angle > 360) {
+				angle = angle - 360;
+			}
+
+			var slot = Math.floor(angle/(this.a * this.t));
+
+			for (var i = 0; i < this.buttons.length; i++) {
+				this.buttons[i].setHover(false);
+			}
+
+			if (this.buttons[slot]) {
+				var button = this.buttons[slot];
+
+				button.setHover(true);
+			}
 		}
 
-		if (this.buttons[slot]) {
-			var button = this.buttons[slot];
+		if (event.type == "end") {
+			if (!this.parent.visible) {
+				return;
+			}
 
-			button.setHover(true);
-		}
-	}
+			var angle = Math.atan2(event.x, -event.y) / (RAD);
 
-	static click(angle) {
-		if (!this.parent.visible) {
-			return;
-		}
+			if (angle < 0) {
+				angle = 180 + angle + 180;
+			}
 
-		angle += this.o;
+			angle += this.o;
 
-		if (angle > 360) {
-			angle = angle - 360;
-		}
+			if (angle > 360) {
+				angle = angle - 360;
+			}
 
-		var slot = Math.floor(angle/(this.a * this.t));
+			var slot = Math.floor(angle/(this.a * this.t));
 
-		if (this.buttons[slot]) {
-			var button = this.buttons[slot];
+			if (this.buttons[slot]) {
+				var button = this.buttons[slot];
 
-			button.toggle();
+				button.toggle();
+			}
+
+			this.toggle();
 		}
 	}
 }

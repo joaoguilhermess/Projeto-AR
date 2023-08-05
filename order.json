@@ -17,7 +17,8 @@
 		"FPS",
 		"Battery",
 		"Controller",
-		"Proxy"
+		"Proxy",
+		"Terminal"
 	],
 	"disabled": []
 }

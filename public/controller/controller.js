@@ -4,13 +4,15 @@ class Controller {
 
 		this.addSocket();
 
-		this.shift = true;
+		this.shift = false;
+		this.agudo = false;
+		this.agudoInverso = false;
+		this.chapeu = false;
+		this.tiu = false;
 
 		this.addBattery();
 
 		this.addKeyboard();
-
-		this.toggleShift();
 
 		this.addCursor();
 	}
@@ -20,9 +22,7 @@ class Controller {
 
 		document.documentElement.addEventListener("click", function() {
 			if (!document.fullscreenElement) {
-				document.documentElement.requestFullscreen();
-
-				context.toggleCursor();
+				// document.documentElement.requestFullscreen();
 			}
 		});
 	}
@@ -64,6 +64,8 @@ class Controller {
 	static addKeyboard() {
 		var list = document.querySelectorAll(".key");
 
+		this.update();
+
 		var context = this;
 
 		for (var i = 0; i < list.length; i++) {
@@ -72,25 +74,135 @@ class Controller {
 
 				if (key == "SHIFT") {
 					context.toggleShift();
+				} else if (key == "´") {
+					context.toggleAgudo(true);
+					context.toggleAgudoInverso(false);
+					context.toggleChapeu(false);
+					context.toggleTiu(false);
+				} else if (key == "`") {
+					context.toggleAgudo(false);
+					context.toggleAgudoInverso(true);
+					context.toggleChapeu(false);
+					context.toggleTiu(false);
+				} else if (key == "^") {
+					context.toggleAgudo(false);
+					context.toggleAgudoInverso(false);
+					context.toggleChapeu(true);
+					context.toggleTiu(false);
+				} else if (key == "~") {
+					context.toggleAgudo(false);
+					context.toggleAgudoInverso(false);
+					context.toggleChapeu(false);
+					context.toggleTiu(true);
 				} else {
 					SocketIO.socket.emit("controller-keyboard", key);
 				}
+
+				context.update();
 			});
 		}
 	}
 
 	static toggleShift() {
-		var list = document.querySelectorAll(".key");
-
 		this.shift = !this.shift;
+	}
+
+	static toggleAgudo(value) {
+		this.agudo = value;
+	}
+
+	static toggleAgudoInverso(value) {
+		this.agudoInverso = value;
+	}
+
+	static toggleChapeu(value) {
+		this.chapeu = value;
+	}
+
+	static toggleTiu(value) {
+		this.tiu = value;
+	}
+
+	static update() {
+		var list = document.querySelectorAll(".key");
 
 		for (var i = 0; i < list.length; i++) {
 			if (this.shift) {
-				if (list[i].getAttribute("shift") != null) {
-					list[i].textContent = list[i].getAttribute("shift");
+				if (this.agudo) {
+					if (list[i].getAttribute("agudoshift") != null) {
+						list[i].textContent = list[i].getAttribute("agudoshift");
+					} else {
+						if (list[i].getAttribute("shift") != null) {
+							list[i].textContent = list[i].getAttribute("shift");
+						} else {
+							list[i].textContent = list[i].getAttribute("key");
+						}
+					}
+				} else if (this.agudoInverso) {
+					if (list[i].getAttribute("agudoinversoshift") != null) {
+						list[i].textContent = list[i].getAttribute("agudoinversoshift");
+					} else {
+						if (list[i].getAttribute("shift") != null) {
+							list[i].textContent = list[i].getAttribute("shift");
+						} else {
+							list[i].textContent = list[i].getAttribute("key");
+						}
+					}
+				} else if (this.chapeu) {
+					if (list[i].getAttribute("chapeushift") != null) {
+						list[i].textContent = list[i].getAttribute("chapeushift");
+					} else {
+						if (list[i].getAttribute("shift") != null) {
+							list[i].textContent = list[i].getAttribute("shift");
+						} else {
+							list[i].textContent = list[i].getAttribute("key");
+						}
+					}
+				} else if (this.tiu) {
+					if (list[i].getAttribute("tiushift") != null) {
+						list[i].textContent = list[i].getAttribute("tiushift");
+					} else {
+						if (list[i].getAttribute("shift") != null) {
+							list[i].textContent = list[i].getAttribute("shift");
+						} else {
+							list[i].textContent = list[i].getAttribute("key");
+						}
+					}
+				} else {
+					if (list[i].getAttribute("shift") != null) {
+						list[i].textContent = list[i].getAttribute("shift");
+					} else {
+						list[i].textContent = list[i].getAttribute("key");
+					}
 				}
 			} else {
-				list[i].textContent = list[i].getAttribute("key");
+				if (this.agudo) {
+					if (list[i].getAttribute("agudo") != null) {
+						list[i].textContent = list[i].getAttribute("agudo");
+					} else {
+						list[i].textContent = list[i].getAttribute("key");
+					}
+				} else if (this.agudoInverso) {
+					if (list[i].getAttribute("agudoinverso") != null) {
+						list[i].textContent = list[i].getAttribute("agudoinverso");
+					} else {
+						list[i].textContent = list[i].getAttribute("key");
+					}
+				} else if (this.chapeu) {
+					if (list[i].getAttribute("chapeu") != null) {
+						list[i].textContent = list[i].getAttribute("chapeu");
+					} else {
+						list[i].textContent = list[i].getAttribute("key");
+					}
+				} else if (this.tiu) {
+					if (list[i].getAttribute("tiu") != null) {
+						list[i].textContent = list[i].getAttribute("tiu");
+					} else {
+						list[i].textContent = list[i].getAttribute("key");
+					}
+				} else {
+					list[i].textContent = list[i].getAttribute("key");
+				}
 			}
 		}
 	}
@@ -101,8 +213,8 @@ class Controller {
 		this.cursor = false;
 
 		document.documentElement.addEventListener("touchstart", function(event) {
-			if (!event.target.classList.includes("key")) {
-				this.cursor = true;
+			if (!event.target.classList.contains("key")) {
+				context.cursor = true;
 
 				event.preventDefault();
 
@@ -114,12 +226,12 @@ class Controller {
 				context.pX = x;
 				context.pY = y;
 			} else {
-				this.cursor = false;
+				context.cursor = false;
 			}
 		});
 
 		document.documentElement.addEventListener("touchmove", function(event) {
-			if (this.cursor) {
+			if (context.cursor) {
 				event.preventDefault();
 
 				var y = (event.touches[0].pageY/window.innerHeight - 0.5) * 2;
@@ -133,8 +245,10 @@ class Controller {
 		});
 
 		document.documentElement.addEventListener("touchend", function(event) {
-			if (this.cursor) {
+			if (context.cursor) {
 				SocketIO.socket.emit("controller-end", context.pX, context.pY);
+
+				context.cursor = false;
 			}
 		});
 	}
