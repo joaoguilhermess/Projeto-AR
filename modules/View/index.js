@@ -2,7 +2,62 @@ class View {
 	static Init() {
 		this.scale = 2.5;
 
+		this.started = false;
+
 		this.addButton();
+	}
+
+	static addButton() {
+		var button = new AR.RadialButton();
+
+		var context = this;
+
+		button.setCallback(function() {
+			if (!context.started) {
+				context.Start();
+
+				button.toggle();
+			}
+
+			context.Focus();
+		});
+
+		button.setText("VIEW");
+
+		this.button = button;
+	}
+
+	static async Start() {
+		this.started = true;
+
+		await this.addSource();
+
+		await this.addVideo();
+
+		this.addCanvas();
+	}
+
+	static async addSource() {
+		var stream = await new Promise(function(resolve, reject) {
+			navigator.getUserMedia({
+				video: {
+					facingMode: "environment",
+					height: 2160/2,
+					width: 4096/2
+				}, audio: false
+			}, resolve, reject);
+		});
+
+		var source = document.createElement("video");
+
+		source.autoplay = true;
+		source.style.display = "none";
+
+		source.srcObject = stream;
+
+		document.body.append(source);
+
+		this.source = source; 
 	}
 
 	static async addVideo() {
@@ -29,52 +84,49 @@ class View {
 		this.video = video;
 	}
 
-	static async addSource() {
-		var stream = await new Promise(function(resolve, reject) {
-			navigator.getUserMedia({
-				video: {
-					facingMode: "environment",
-					height: 2160/2,
-					width: 4096/2
-				}, audio: false
-			}, resolve, reject);
-		});
+	static addCanvas() {
+		var canvas = document.createElement("canvas");
 
-		var source = document.createElement("video");
+		canvas.style.display = "none";
 
-		source.autoplay = true;
-		source.style.display = "none";
+		canvas.width = this.source.videoWidth;
+		canvas.height = this.source.videoHeight;
 
-		source.srcObject = stream;
+		var context = canvas.getContext("2d");
 
-		document.body.append(source);
+		canvas.context = context;
 
-		this.source = source; 
+		document.body.append(canvas);
+
+		this.canvas = canvas;
 	}
 
-	static addButton() {
-		var button = new AR.RadialButton();
-
+	static Focus() {
 		var context = this;
 
-		button.setCallback(function(active) {
-			if (active) {
-				context.Start();
-			} else {
-				context.Stop();
+		AR.Controller.setFocus(function(event) {
+			if (event.type == "key") {
+				if (event.key == "c" || event.key == "C") {
+					context.takePhoto();
+				}
 			}
 		});
-
-		button.setText("VIEW");
 	}
 
-	static async Start() {
-		await this.addSource();
+	static takePhoto() {
+		this.canvas.context.drawImage(this.source, 0, 0, this.source.videoWidth, this.source.videoHeight);
 
-		this.addVideo();
+		this.canvas.toBlob(function(blob) {
+			fetch("/photos", {
+				method: "POST",
+				body: blob
+			});
+		});
 	}
 
 	static Stop() {
+		this.started = true;
+
 		if (this.source) {
 			var tracks = this.source.srcObject.getTracks();
 
@@ -83,6 +135,8 @@ class View {
 			}
 
 			this.source.remove();
+
+			this.canvas.remove();
 
 			AR.Camera.remove(this.video);
 			
@@ -93,6 +147,8 @@ class View {
 			delete this.video;
 
 			delete this.source;
+
+			delete this.canvas;
 		}
 	}
 }

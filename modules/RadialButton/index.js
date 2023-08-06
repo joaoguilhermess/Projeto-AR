@@ -110,9 +110,11 @@ class RadialButton {
 			this.border.material.color.setHex(AR.Palette.BackgroundLight);
 			this.text.material.color.setHex(AR.Palette.Text);
 		}
+	}
 
+	click() {
 		if (this.callback) {
-			this.callback(this.active);
+			this.callback();
 		}
 	}
 

@@ -8,9 +8,9 @@ class Terminal {
 
 		this.lines = 10;
 
-		this.addButton();
+		this.started = false;
 
-		this.Start();
+		this.addButton();
 	}
 
 	static addButton() {
@@ -18,55 +18,69 @@ class Terminal {
 
 		var context = this;
 
-		button.setCallback(function(active) {
-			if (active) {
+		button.setCallback(function() {
+			if (!context.started) {
 				context.Start();
-			} else {
-				context.Stop();
+
+				button.toggle();
 			}
+
+			context.Focus();
 		});
 
-		button.setText("CODE");
+		button.setText("RUN");
+
+		this.button = button;
 	}
 
 	static Start() {
-		var context = this;
-
-		AR.Controller.setFocus(function(event) {
-			console.log("terminal", event);
-
-			if (event.type == "key") {
-				if (event.key == "BACKSPACE") {
-					if (context.output.text[context.output.text.length - 1] != "\n") {
-						context.output.text = context.output.text.slice(0, -1);
-					}
-				} else if (event.key == "TAB") {
-					context.output.text += "    ";
-				} else if (event.key == "SPACE") {
-					context.output.text += " ";
-				} else {
-					context.output.text += event.key;
-				}
-
-				var t = 0;
-
-				for (var i = 0; i < context.output.text.length; i++) {
-					t += 1;
-
-					if (t == context.columns) {
-						if (context.output.text[i + 1] != "\n") {
-							context.output.text = context.output.text.slice(0,i) + "\n" + context.output.text.slice(i + 2);
-						}
-					}
-				}
-			}
-		});
+		this.started = true;
 
 		this.addParent();
 
 		this.addBackground();
 	
+		this.addInput();
+
 		this.addOutput();
+	}
+
+	static Focus() {
+		var context = this;
+
+		AR.Controller.setFocus(function(event) {
+			if (event.type == "key") {
+				if (event.key == "BACKSPACE") {
+					if (context.input.text[context.input.text.length - 1] != "\n") {
+						context.input.text = context.input.text.slice(0, -1);
+					}
+				} else if (event.key == "TAB") {
+					context.input.text += "    ";
+				} else if (event.key == "SPACE") {
+					context.input.text += " ";
+				} else {
+					context.input.text += event.key;
+				}
+
+				var t = 0;
+
+				for (var i = 0; i < context.input.text.length; i++) {
+					if (context.input.text[i] != "\n") {
+						t += 1;
+					}
+
+					if (t == context.columns) {
+						if (context.input.text[i + 1] != "\n") {
+							context.input.text = context.input.text.slice(0, i + 1) + "\n" + context.input.text.slice(i + 1);
+						}
+
+						t = 0;
+					}
+				}
+
+				context.input.sync();
+			}
+		});
 	}
 
 	static addParent() {
@@ -119,7 +133,7 @@ class Terminal {
 		text.letterSpacing = 0;
 		text.lineHeight = 1;
 
-		text.clipRect = [0, -text.fontSize * 22, 2 - 0.055, 0];
+		text.clipRect = [0, text.fontSize * -20, 2 - 0.055, 0];
 
 		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
 
@@ -127,7 +141,9 @@ class Terminal {
 			color: AR.Palette.Text
 		});
 
-		text.position.set(-this.x + text.fontSize/3, this.y -text.fontSize/3, 0);
+		text.position.set(-this.x + text.fontSize/3, this.y - text.fontSize/3, 0);
+
+		text.text = "banana";
 
 		text.sync();
 
@@ -136,13 +152,51 @@ class Terminal {
 		this.output = text;
 	}
 
+	static addInput() {
+		var text = new TroikaText();
+
+		text.fontSize = 0.06;
+		text.textAlign = "left";
+
+		text.anchorX = "left";
+		text.anchorX = "top";
+
+		text.whiteSpace = "prewrap";
+
+		text.letterSpacing = 0;
+		text.lineHeight = 1;
+
+		text.clipRect = [0, text.fontSize * -2, 2 - 0.055, 0];
+
+		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
+
+		text.material = new THREE.MeshBasicMaterial({
+			color: AR.Palette.Text
+		});
+
+		text.position.set(-this.x + text.fontSize/3, -this.y + text.fontSize/3 + text.fontSize * 3, 0);
+
+		text.sync();
+
+		this.parent.add(text);
+
+		this.input = text;
+	}
+
 	static Stop() {
+		this.started = false;
+
+		this.button.toggle();
+
 		AR.Camera.remove(this.parent);
 		delete this.parent;
 
 		this.background.geometry.dispose();
 		this.background.material.dispose();
 		delete this.background;
+
+		this.input.dispose();
+		delete this.input;
 
 		this.output.dispose();
 		delete this.output;

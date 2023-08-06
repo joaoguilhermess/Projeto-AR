@@ -113,7 +113,7 @@ class RadialMenu {
 			if (this.buttons[slot]) {
 				var button = this.buttons[slot];
 
-				button.toggle();
+				button.click();
 			}
 
 			this.toggle();

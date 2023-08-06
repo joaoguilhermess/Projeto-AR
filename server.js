@@ -22,6 +22,10 @@ export default class Server {
 		this.app.get(path, script);
 	}
 
+	static registryPostScript(path, script) {
+		this.app.post(path, script);
+	}
+
 	static registryFile(path, file) {
 		this.app.get(path, function(req, res) {
 			res.sendFile(file);

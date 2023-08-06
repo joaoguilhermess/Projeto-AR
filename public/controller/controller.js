@@ -22,7 +22,15 @@ class Controller {
 
 		document.documentElement.addEventListener("click", function() {
 			if (!document.fullscreenElement) {
-				// document.documentElement.requestFullscreen();
+				document.documentElement.requestFullscreen();
+			}
+		});
+
+		document.documentElement.addEventListener("fullscreenchange", function() {
+			if (document.fullscreenElement) {
+				document.body.style.display = "flex";
+			} else {
+				document.body.style.display = "none";
 			}
 		});
 	}
@@ -71,7 +79,7 @@ class Controller {
 		for (var i = 0; i < list.length; i++) {
 			list[i].addEventListener("touchstart", function(event) {
 				var key = event.target.textContent;
-
+				
 				if (key == "SHIFT") {
 					context.toggleShift();
 				} else if (key == "´") {
@@ -95,10 +103,34 @@ class Controller {
 					context.toggleChapeu(false);
 					context.toggleTiu(true);
 				} else {
+					context.toggleAgudo(false);
+					context.toggleAgudoInverso(false);
+					context.toggleChapeu(false);
+					context.toggleTiu(false);
 					SocketIO.socket.emit("controller-keyboard", key);
 				}
 
+				event.target.timeout = setTimeout(function() {
+					event.target.interval = setInterval(function() {
+						SocketIO.socket.emit("controller-keyboard", key);
+					}, 100);
+				}, 300);
+
 				context.update();
+			});
+
+			list[i].addEventListener("touchend", function(event) {
+				if (event.target.timeout) {
+					clearTimeout(event.target.timeout);
+
+					delete event.target.timeout;
+				}
+
+				if (event.target.interval) {
+					clearInterval(event.target.interval);
+
+					delete event.target.interval;
+				}
 			});
 		}
 	}
@@ -212,7 +244,7 @@ class Controller {
 
 		this.cursor = false;
 
-		document.documentElement.addEventListener("touchstart", function(event) {
+		document.body.addEventListener("touchstart", function(event) {
 			if (!event.target.classList.contains("key")) {
 				context.cursor = true;
 
@@ -230,7 +262,7 @@ class Controller {
 			}
 		});
 
-		document.documentElement.addEventListener("touchmove", function(event) {
+		document.body.addEventListener("touchmove", function(event) {
 			if (context.cursor) {
 				event.preventDefault();
 
@@ -244,7 +276,7 @@ class Controller {
 			}
 		});
 
-		document.documentElement.addEventListener("touchend", function(event) {
+		document.body.addEventListener("touchend", function(event) {
 			if (context.cursor) {
 				SocketIO.socket.emit("controller-end", context.pX, context.pY);
 
