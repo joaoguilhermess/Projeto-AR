@@ -19,7 +19,7 @@ class Controller {
 	}
 
 	static addCursor() {
-		this.setFocus(function(...args) {AR.RadialMenu.input(...args)});
+		this.Focus();
 
 		var context = this;
 
@@ -40,22 +40,34 @@ class Controller {
 		});
 
 		AR.SocketIO.socket.on("controller-end", function(x, y) {
-			var d = Math.sqrt(x*x + y*y);
+			context.focus({
+				type: "end",
+				x: x,
+				y: y
+			});
 
-			if (d < 0.25) {
-				context.setFocus(function(...args) {AR.RadialMenu.input(...args)});
-			} else {
-				context.focus({
-					type: "end",
-					x: x,
-					y: y
-				});
+			if (x < -1/3*2 && y < 0) {
+				context.Focus();
 			}
 		});
 	}
 
+	static Focus() {
+		this.setFocus(function(...args) {AR.RadialMenu.input(...args)});
+
+		if (this.unFocus) {
+			this.unFocus();
+		}
+	}
+
 	static setFocus(callback) {
 		this.focus = callback;
+
+		this.focus({});
+	}
+
+	static setUnFocus(callback) {
+		this.unFocus = callback;
 	}
 
 	static addBattery() {

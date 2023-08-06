@@ -20,19 +20,23 @@ class Controller {
 	static addFullscreen() {
 		var context = this;
 
-		document.documentElement.addEventListener("click", function() {
-			if (!document.fullscreenElement) {
-				document.documentElement.requestFullscreen();
-			}
-		});
+		if (!navigator.userAgent.includes("Windows")) {
+			document.documentElement.addEventListener("click", function() {
+				if (!document.fullscreenElement) {
+					document.documentElement.requestFullscreen();
+				}
+			});
 
-		document.documentElement.addEventListener("fullscreenchange", function() {
-			if (document.fullscreenElement) {
-				document.body.style.display = "flex";
-			} else {
-				document.body.style.display = "none";
-			}
-		});
+			document.documentElement.addEventListener("fullscreenchange", function() {
+				if (document.fullscreenElement) {
+					document.body.style.display = "flex";
+				} else {
+					document.body.style.display = "none";
+				}
+			});
+		} else {
+			document.body.style.display = "flex";	
+		}
 	}
 
 	static addSocket() {
