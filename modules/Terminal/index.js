@@ -21,8 +21,6 @@ class Terminal {
 		button.setCallback(function() {
 			if (!context.started) {
 				context.Start();
-
-				button.toggle();
 			}
 
 			context.Focus();
@@ -35,6 +33,8 @@ class Terminal {
 
 	static Start() {
 		this.started = true;
+
+		this.button.toggle();
 
 		this.addParent();
 
@@ -49,15 +49,30 @@ class Terminal {
 		var context = this;
 
 		AR.Controller.setFocus(function(event) {
+			context.parent.visible = true;
+
 			if (event.type == "key") {
 				if (event.key == "BACKSPACE") {
-					if (context.input.text[context.input.text.length - 1] != "\n") {
+					if (context.input.text[context.input.text.length - 1] == "\n") {
+						context.input.text = context.input.text.slice(0, -2);
+					} else {
 						context.input.text = context.input.text.slice(0, -1);
 					}
 				} else if (event.key == "TAB") {
-					context.input.text += "    ";
+					context.input.text += "\t";
 				} else if (event.key == "SPACE") {
 					context.input.text += " ";
+				} else if (event.key == "ENTER") {
+					var text = context.input.text;
+
+					if (text.length > 0) {
+						try {
+							context.output.text = eval(text);
+							context.input.text = "";
+						} catch (e) {
+							context.output.text = e;
+						}
+					}
 				} else {
 					context.input.text += event.key;
 				}
@@ -78,8 +93,16 @@ class Terminal {
 					}
 				}
 
-				context.input.sync();
+				context.input.sync(function() {
+					context.input.anchorY = -context.input.geometry.boundingBox.getSize(new THREE.Vector3()).y + 0.06 * 3;
+
+					context.input.sync();
+				});
 			}
+		});
+
+		AR.Controller.setUnFocus(function() {
+			context.parent.visible = false;
 		});
 	}
 
@@ -122,18 +145,19 @@ class Terminal {
 	static addOutput() {
 		var text = new TroikaText();
 
-		text.fontSize = 0.06;
+		text.fontSize = 0.05;
 		text.textAlign = "left";
 
 		text.anchorX = "left";
-		text.anchorX = "top";
+		text.anchorY = 0;
 
 		text.whiteSpace = "prewrap";
+		text.overflowWrap = "break-word";
 
 		text.letterSpacing = 0;
 		text.lineHeight = 1;
 
-		text.clipRect = [0, text.fontSize * -20, 2 - 0.055, 0];
+		text.clipRect = [0, text.fontSize * -17, 2, 0];
 
 		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
 
@@ -143,7 +167,7 @@ class Terminal {
 
 		text.position.set(-this.x + text.fontSize/3, this.y - text.fontSize/3, 0);
 
-		text.text = "banana";
+		text.maxWidth = 2;
 
 		text.sync();
 
@@ -155,18 +179,18 @@ class Terminal {
 	static addInput() {
 		var text = new TroikaText();
 
-		text.fontSize = 0.06;
+		text.fontSize = 0.05;
 		text.textAlign = "left";
 
 		text.anchorX = "left";
-		text.anchorX = "top";
+		text.anchorY = 0;
 
 		text.whiteSpace = "prewrap";
 
 		text.letterSpacing = 0;
 		text.lineHeight = 1;
 
-		text.clipRect = [0, text.fontSize * -2, 2 - 0.055, 0];
+		text.clipRect = [0, text.fontSize * -4, 2, 0];
 
 		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
 
@@ -174,7 +198,7 @@ class Terminal {
 			color: AR.Palette.Text
 		});
 
-		text.position.set(-this.x + text.fontSize/3, -this.y + text.fontSize/3 + text.fontSize * 3, 0);
+		text.position.set(-this.x + 0.03, -this.y + 0.21, 0);
 
 		text.sync();
 

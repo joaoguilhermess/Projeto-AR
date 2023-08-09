@@ -66,7 +66,7 @@ class RadialButton {
 		text.anchorX = "center";
 		text.anchorY = "middle";
 
-		text.font = "/resources/fonts/Poppins/Poppins-Black.ttf";
+		text.font = "/resources/fonts/Poppins/Poppins-Medium.ttf";
 
 		text.material = new THREE.MeshBasicMaterial({
 			color: AR.Palette.Text

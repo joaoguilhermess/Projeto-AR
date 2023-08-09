@@ -28,8 +28,6 @@ class View {
 
 		button.setCallback(async function() {
 			if (!context.started) {
-				button.toggle();
-
 				await context.Start();
 			}
 
@@ -43,6 +41,8 @@ class View {
 
 	static async Start() {
 		this.started = true;
+
+		this.button.toggle();
 
 		await this.addSource();
 
@@ -229,7 +229,9 @@ class View {
 	}
 
 	static Stop() {
-		this.started = true;
+		this.started = false;
+
+		this.button.toggle();
 
 		if (this.source) {
 			var tracks = this.source.srcObject.getTracks();
@@ -242,17 +244,33 @@ class View {
 
 			this.canvas.remove();
 
-			AR.Camera.remove(this.video);
+			this.parent.remove(this.video);
 			
 			this.video.geometry.dispose();
 
 			this.video.material.dispose();
+
+			this.parent.remove(this.take);
+
+			this.take.geometry.dispose();
+
+			this.take.material.dispose();
+
+			this.parent.remove(this.takeBackground);
+
+			this.takeBackground.geometry.dispose();
+
+			this.takeBackground.material.dispose();
 
 			delete this.video;
 
 			delete this.source;
 
 			delete this.canvas;
+
+			delete this.take;
+
+			delete this.takeBackground;
 		}
 	}
 }

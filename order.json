@@ -2,6 +2,7 @@
 	"enabled": [
 		"Constants",
 		"Cache",
+		"Proxy",
 		"Palette",
 		"Scene",
 		"Renderer",
@@ -13,11 +14,11 @@
 		"RadialButton",
 		"LeftMenu",
 		"LeftItem",
-		"View",
 		"FPS",
 		"Battery",
+		"Clock",
 		"Controller",
-		"Proxy",
+		"View",
 		"Terminal"
 	],
 	"disabled": []

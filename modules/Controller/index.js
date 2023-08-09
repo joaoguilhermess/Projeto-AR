@@ -11,10 +11,14 @@ class Controller {
 		var context = this;
 
 		AR.SocketIO.socket.on("controller-keyboard", function(key) {
-			context.focus({
-				type: "key",
-				key: key
-			});
+			if (key == "BACK") {
+				context.Focus();
+			} else {
+				context.focus({
+					type: "key",
+					key: key
+				});
+			}
 		});
 	}
 
@@ -45,10 +49,6 @@ class Controller {
 				x: x,
 				y: y
 			});
-
-			if (x < -1/3*2 && y < 0) {
-				context.Focus();
-			}
 		});
 	}
 
