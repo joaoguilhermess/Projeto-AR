@@ -146,7 +146,9 @@ class Terminal {
 		});
 
 		AR.Controller.setUnFocus(function() {
-			context.parent.visible = false;
+			if (context.parent) {
+				context.parent.visible = false;
+			}
 		});
 	}
 
