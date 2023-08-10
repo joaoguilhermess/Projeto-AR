@@ -14,7 +14,7 @@ class LeftItem {
 	addParent() {
 		var parent = new THREE.Group();
 
-		parent.position.set(this.y/3*2, (this.slot + 0.5) * -this.y, 0);
+		parent.position.set(0, (this.slot + 0.75) * -this.y, 0);
 
 		AR.LeftMenu.parent.add(parent);
 
@@ -35,6 +35,8 @@ class LeftItem {
 		text.material = new THREE.MeshBasicMaterial({
 			color: AR.Palette.TextVeryDark
 		});
+
+		text.position.set(this.y/2, 0, 0);
 
 		this.parent.add(text);
 
@@ -62,7 +64,7 @@ class LeftItem {
 			color: AR.Palette.Text
 		});
 
-		text.position.set(AR.LeftMenu.x - this.y/3*2, 0, 0);
+		text.position.set(AR.LeftMenu.x - this.y/2, 0, 0);
 
 		this.parent.add(text);
 

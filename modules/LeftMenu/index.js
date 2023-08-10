@@ -1,6 +1,6 @@
 class LeftMenu {
 	static Init() {
-		this.x = 0.35;
+		this.x = 0.4;
 
 		this.items = [];
 
@@ -12,7 +12,7 @@ class LeftMenu {
 	static addParent() {
 		var parent = new THREE.Group();
 
-		parent.position.set(-1.8, 0, -0.8);
+		parent.position.set(-1.75, 0, -0.8);
 
 		AR.Camera.add(parent);
 
@@ -38,9 +38,7 @@ class LeftMenu {
 
 		var mesh = new THREE.Mesh(geometry, material);
 
-		mesh.position.set(0, 0, -0.01);
-
-		// this.parent.position.y = y/2;
+		mesh.renderOrder = -1;
 
 		this.parent.add(mesh);
 

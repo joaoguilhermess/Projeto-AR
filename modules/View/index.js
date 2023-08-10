@@ -95,8 +95,6 @@ class View {
 
 		var video = new THREE.Mesh(geometry, material);
 
-		video.position.set(0, 0, 0);
-
 		this.parent.add(video);
 
 		this.video = video;
@@ -127,11 +125,16 @@ class View {
 		var a = 360/t;
 
 		var r = 0.1;
+		var r2 = 0.085;
 
 		shape.moveTo(0, r);
 
-		for (var i = 1; i < t; i++) {
+		for (var i = 1; i <= t; i++) {
 			shape.lineTo(Math.sin(RAD * i * a) * r, Math.cos(RAD * i * a) * r);
+		}
+
+		for (var i = t; i >= 0; i--) {
+			shape.lineTo(Math.sin(RAD * i * a) * r2, Math.cos(RAD * i * a) * r2);
 		}
 
 		var geometry = new THREE.ShapeGeometry(shape);
@@ -144,7 +147,7 @@ class View {
 
 		var mesh = new THREE.Mesh(geometry, material);
 
-		mesh.position.set(0, -this.scale * 0.3, 0.2 - 0.01);
+		mesh.position.set(0, -this.scale * 0.3, 0.2);
 
 		mesh.visible = false;
 
@@ -160,7 +163,7 @@ class View {
 
 		var a = 360/t;
 
-		var r = 0.09;
+		var r = 0.085;
 
 		shape.moveTo(0, r);
 
@@ -176,7 +179,7 @@ class View {
 
 		var mesh = new THREE.Mesh(geometry, material);
 
-		mesh.position.set(0, -this.scale * 0.3 + 0.01, 0.2);
+		mesh.position.set(0, -this.scale * 0.3, 0.2);
 
 		mesh.visible = false;
 

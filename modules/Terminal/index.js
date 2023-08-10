@@ -3,10 +3,10 @@ class Terminal {
 		this.x = 1;
 		this.y = 0.65;
 
-		this.rows = 22;
-		this.columns = 54;
+		this.rows = 25;
+		this.columns = 0;
 
-		this.lines = 10;
+		this.prefix = "> ";
 
 		this.started = false;
 
@@ -40,9 +40,13 @@ class Terminal {
 
 		this.addBackground();
 	
-		this.addInput();
+		this.addStd();
 
-		this.addOutput();
+		this.std.text = this.prefix;
+		this.offset = this.std.text.length;
+
+		this.history = [];
+		this.index = 0;
 	}
 
 	static Focus() {
@@ -53,50 +57,90 @@ class Terminal {
 
 			if (event.type == "key") {
 				if (event.key == "BACKSPACE") {
-					if (context.input.text[context.input.text.length - 1] == "\n") {
-						context.input.text = context.input.text.slice(0, -2);
-					} else {
-						context.input.text = context.input.text.slice(0, -1);
+					if (context.std.text.length > context.offset) {
+						context.std.text = context.std.text.slice(0, -1);
 					}
 				} else if (event.key == "TAB") {
-					context.input.text += "\t";
+					context.std.text += "\t";
 				} else if (event.key == "SPACE") {
-					context.input.text += " ";
-				} else if (event.key == "ENTER") {
-					var text = context.input.text;
-
-					if (text.length > 0) {
-						try {
-							context.output.text = eval(text);
-							context.input.text = "";
-						} catch (e) {
-							context.output.text = e;
+					context.std.text += " ";
+				} else if (event.key == "NEW LINE") {
+					context.std.text += "\n";
+				} else if (event.key == "TOP") {
+					if (context.history.length > 0) {
+						while (context.std.text.length > context.offset) {
+							context.std.text = context.std.text.slice(0, -1);
 						}
+
+						context.std.text += context.history[context.history.length - 1 - context.index];
+
+						if (context.index < context.history.length - 1) {
+							context.index += 1;
+						}
+					}
+				} else if (event.key == "BOTTOM") {
+					if (context.history.length > 0) {
+						while (context.std.text.length > context.offset) {
+							context.std.text = context.std.text.slice(0, -1);
+						}
+
+						context.std.text += context.history[context.history.length - 1 - context.index];
+
+						if (context.index > 0) {
+							context.index -= 1;
+						}
+					}
+				} else if (event.key == "ENTER") {
+					context.index = 0;
+
+					var text = context.std.text;
+
+					text = text.slice(context.offset);
+
+					if (text == "clear") {
+						context.std.text = context.prefix;
+						context.offset = context.std.text.length;
+					} else if (text == "exit") {
+						context.Stop();
+					} else if (text.length > 0) {
+						context.std.text += "\n";
+						context.offset = context.std.text.length;
+
+						try {
+							context.std.text += eval(text);
+						} catch (e) {
+							context.std.text += e;
+						}
+
+						context.std.text += "\n";
+
+						context.std.text += context.prefix;
+
+						context.offset = context.std.text.length;
+					} else {
+						context.std.text += "\n";
+
+						context.std.text += context.prefix;
+						context.offset = context.std.text.length;
+					}
+
+					if (context.history[context.history.length - 1] != text) {
+						context.history.push(text);
 					}
 				} else {
-					context.input.text += event.key;
+					context.std.text += event.key;
 				}
 
-				var t = 0;
+				context.std.sync(function() {
+					var r = context.std.geometry.boundingBox.getSize(new THREE.Vector3()).y/0.05;
 
-				for (var i = 0; i < context.input.text.length; i++) {
-					if (context.input.text[i] != "\n") {
-						t += 1;
+					if (r > context.rows) {
+						context.std.anchorY = -(r - context.rows) * 0.05;
+					} else {
+						context.std.anchorY = 0;
 					}
 
-					if (t == context.columns) {
-						if (context.input.text[i + 1] != "\n") {
-							context.input.text = context.input.text.slice(0, i + 1) + "\n" + context.input.text.slice(i + 1);
-						}
-
-						t = 0;
-					}
-				}
-
-				context.input.sync(function() {
-					context.input.anchorY = -context.input.geometry.boundingBox.getSize(new THREE.Vector3()).y + 0.06 * 3;
-
-					context.input.sync();
+					context.std.sync();
 				});
 			}
 		});
@@ -135,14 +179,16 @@ class Terminal {
 
 		var mesh = new THREE.Mesh(geometry, material);
 
-		mesh.position.set(0, 0, -0.01);
+		mesh.position.set(0, 0, 0);
+
+		mesh.renderOrder = -1;
 
 		this.parent.add(mesh);
 
 		this.background = mesh;
 	}
 
-	static addOutput() {
+	static addStd() {
 		var text = new TroikaText();
 
 		text.fontSize = 0.05;
@@ -157,7 +203,7 @@ class Terminal {
 		text.letterSpacing = 0;
 		text.lineHeight = 1;
 
-		text.clipRect = [0, text.fontSize * -17, 2, 0];
+		text.clipRect = [0, text.fontSize * -this.rows, 2, 0];
 
 		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
 
@@ -173,38 +219,7 @@ class Terminal {
 
 		this.parent.add(text);
 
-		this.output = text;
-	}
-
-	static addInput() {
-		var text = new TroikaText();
-
-		text.fontSize = 0.05;
-		text.textAlign = "left";
-
-		text.anchorX = "left";
-		text.anchorY = 0;
-
-		text.whiteSpace = "prewrap";
-
-		text.letterSpacing = 0;
-		text.lineHeight = 1;
-
-		text.clipRect = [0, text.fontSize * -4, 2, 0];
-
-		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
-
-		text.material = new THREE.MeshBasicMaterial({
-			color: AR.Palette.Text
-		});
-
-		text.position.set(-this.x + 0.03, -this.y + 0.21, 0);
-
-		text.sync();
-
-		this.parent.add(text);
-
-		this.input = text;
+		this.std = text;
 	}
 
 	static Stop() {
@@ -219,11 +234,13 @@ class Terminal {
 		this.background.material.dispose();
 		delete this.background;
 
-		this.input.dispose();
-		delete this.input;
-
 		this.output.dispose();
 		delete this.output;
+
+		delete this.history;
+		delete this.index;
+
+		AR.Controller.Focus();
 	}
 }
 
