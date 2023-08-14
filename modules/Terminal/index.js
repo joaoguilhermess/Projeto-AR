@@ -157,7 +157,7 @@ class Terminal {
 
 		AR.Camera.add(parent);
 
-		parent.position.set(0, 0, -0.9);
+		parent.position.set(0, 0, -0.5);
 
 		this.parent = parent;
 	}

@@ -25,6 +25,10 @@ class Clock {
 		this.spent = spent;
 
 		this.startTime = Date.now();
+
+		this.updateClock();
+		this.updateDate();
+		this.updateSpent();
 	}
 
 	static format(str) {

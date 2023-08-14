@@ -1,24 +1,14 @@
 class View {
 	static Init() {
-		this.scale = 2.5;
+		this.x = 0.04;
+
+		this.scale = 2;
+
+		this.items = [];
 
 		this.started = false;
 
-		this.addParent();
-
 		this.addButton();
-	}
-
-	static addParent() {
-		var parent = new THREE.Group();
-
-		// parent.visible = false;
-
-		parent.position.set(0, 0, -1);
-
-		AR.Camera.add(parent);
-
-		this.parent = parent;
 	}
 
 	static addButton() {
@@ -50,9 +40,7 @@ class View {
 
 		this.addCanvas();
 
-		this.addTakeBackground();
-
-		this.addTake();
+		this.addRight();
 	}
 
 	static async addSource() {
@@ -60,8 +48,8 @@ class View {
 			navigator.getUserMedia({
 				video: {
 					facingMode: "environment",
-					height: 2160/2,
-					width: 4096/2
+					height: 2160/8,
+					width: 4096/8
 				}, audio: false
 			}, resolve, reject);
 		});
@@ -95,7 +83,9 @@ class View {
 
 		var video = new THREE.Mesh(geometry, material);
 
-		this.parent.add(video);
+		video.position.set(0, 0, -2);
+
+		AR.Camera.add(video);
 
 		this.video = video;
 	}
@@ -117,106 +107,42 @@ class View {
 		this.canvas = canvas;
 	}
 
-	static addTakeBackground() {
-		var shape = new THREE.Shape();
+	static addRight() {
+		var menu = new AR.RightMenu();
 
-		var t = 64;
+		var button = new AR.RightButton(menu);
 
-		var a = 360/t;
-
-		var r = 0.1;
-		var r2 = 0.085;
-
-		shape.moveTo(0, r);
-
-		for (var i = 1; i <= t; i++) {
-			shape.lineTo(Math.sin(RAD * i * a) * r, Math.cos(RAD * i * a) * r);
-		}
-
-		for (var i = t; i >= 0; i--) {
-			shape.lineTo(Math.sin(RAD * i * a) * r2, Math.cos(RAD * i * a) * r2);
-		}
-
-		var geometry = new THREE.ShapeGeometry(shape);
-
-		var material = new THREE.MeshBasicMaterial({
-			color: AR.Palette.Background,
-			transparent: true,
-			opacity: 0.8
-		});
-
-		var mesh = new THREE.Mesh(geometry, material);
-
-		mesh.position.set(0, -this.scale * 0.3, 0.2);
-
-		mesh.visible = false;
-
-		this.parent.add(mesh);
-
-		this.takeBackground = mesh;
-	}
-
-	static addTake() {
-		var shape = new THREE.Shape();
-
-		var t = 64;
-
-		var a = 360/t;
-
-		var r = 0.085;
-
-		shape.moveTo(0, r);
-
-		for (var i = 1; i < t; i++) {
-			shape.lineTo(Math.sin(RAD * i * a) * r, Math.cos(RAD * i * a) * r);
-		}
-
-		var geometry = new THREE.ShapeGeometry(shape);
-
-		var material = new THREE.MeshBasicMaterial({
-			color: AR.Palette.Primary
-		});
-
-		var mesh = new THREE.Mesh(geometry, material);
-
-		mesh.position.set(0, -this.scale * 0.3, 0.2);
-
-		mesh.visible = false;
-
-		this.parent.add(mesh);
-
-		this.take = mesh;
+		button.setTitle("banana");
+		button.setText("90%");
 	}
 
 	static Focus() {
 		var context = this;
 
 		AR.Controller.setFocus(function(event) {
-			context.takeBackground.visible = true;
-			context.take.visible = true;
+			// context.parent.visible = true;
 
-			if (Math.abs(event.x) < 1/3 && event.y > 0) {
-				if (event.type == "move") {
-					context.take.material.color.setHex(AR.Palette.PrimaryDark);
-				} else if (event.type == "end") {
-					context.takePhoto();
+			// if (Math.abs(event.x) < 1/3 && event.y > 0) {
+			// 	if (event.type == "move") {
+			// 		context.take.material.color.setHex(AR.Palette.PrimaryDark);
+			// 	} else if (event.type == "end") {
+			// 		context.takePhoto();
 
-					if (context.take.material.timeout) {
-						clearTimeout(context.take.material);
-					}
+			// 		if (context.take.material.timeout) {
+			// 			clearTimeout(context.take.material);
+			// 		}
 
-					context.take.material.timeout = setTimeout(function() {
-						context.take.material.color.setHex(AR.Palette.Primary);
-					}, 100);
-				}
-			} else {
-				context.take.material.color.setHex(AR.Palette.Primary);
-			}
+			// 		context.take.material.timeout = setTimeout(function() {
+			// 			context.take.material.color.setHex(AR.Palette.Primary);
+			// 		}, 100);
+			// 	}
+			// } else {
+			// 	context.take.material.color.setHex(AR.Palette.Primary);
+			// }
 		});
 
 		AR.Controller.setUnFocus(function() {
-			context.takeBackground.visible = false;
-			context.take.visible = false;
+			// context.parent.visible = true;
 		});
 	}
 
@@ -247,33 +173,17 @@ class View {
 
 			this.canvas.remove();
 
-			this.parent.remove(this.video);
+			AR.Camera.remove(this.video);
 			
 			this.video.geometry.dispose();
 
 			this.video.material.dispose();
-
-			this.parent.remove(this.take);
-
-			this.take.geometry.dispose();
-
-			this.take.material.dispose();
-
-			this.parent.remove(this.takeBackground);
-
-			this.takeBackground.geometry.dispose();
-
-			this.takeBackground.material.dispose();
 
 			delete this.video;
 
 			delete this.source;
 
 			delete this.canvas;
-
-			delete this.take;
-
-			delete this.takeBackground;
 		}
 	}
 }

@@ -16,7 +16,7 @@ class Battery {
 	}
 
 	static update() {
-		this.item.setText(this.battery.level * 100 + "%");
+		this.item.setText(Math.round(this.battery.level * 100) + "%");
 	}
 }
 

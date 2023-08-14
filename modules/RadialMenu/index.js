@@ -1,6 +1,6 @@
 class RadialMenu {
 	static Init() {
-		this.r = 0.5/2;
+		this.r = 0.08/2;
 
 		this.t = 8;
 		this.t2 = 8;
@@ -21,7 +21,7 @@ class RadialMenu {
 
 		parent.visible = false;
 
-		parent.position.set(0, 0, -0.8);
+		parent.position.set(0, 0, -0.25);
 
 		AR.Camera.add(parent);
 
@@ -45,7 +45,9 @@ class RadialMenu {
 
 		var mesh = new THREE.Mesh(geometry, material);
 
-		mesh.position.set(0, 0, -0.01);
+		mesh.renderOrder = -1;
+
+		mesh.position.set(0, 0, 0);
 
 		this.parent.add(mesh);
 	}

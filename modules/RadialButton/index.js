@@ -60,7 +60,7 @@ class RadialButton {
 	addText(content) {
 		var text = new TroikaText();
 
-		text.fontSize = 0.03;
+		text.fontSize = 0.004;
 		text.textAlign = "center";
 
 		text.anchorX = "center";
@@ -72,7 +72,7 @@ class RadialButton {
 			color: AR.Palette.Text
 		});
 
-		text.position.set(Math.sin(RAD * (this.t * this.slot) * this.a) * this.r * this.wT, Math.cos(RAD * (this.t * this.slot) * this.a) * this.r * this.wT, 0.01);
+		text.position.set(Math.sin(RAD * (this.t * this.slot) * this.a) * this.r * this.wT, Math.cos(RAD * (this.t * this.slot) * this.a) * this.r * this.wT, 0);
 
 		this.parent.add(text);
 

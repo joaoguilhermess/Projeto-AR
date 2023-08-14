@@ -17,6 +17,8 @@ renderer.toneMappingExposure = 1;
 renderer.maxMorphTargets = 8;
 renderer.maxMorphNormals = 4;
 
+renderer.sortObjects = true;
+
 renderer.xr.enabled = true;
 renderer.xr.setReferenceSpaceType("local");
 

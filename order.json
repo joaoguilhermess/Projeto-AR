@@ -3,6 +3,7 @@
 		"Constants",
 		"Cache",
 		"Proxy",
+		"Viewer",
 		"Palette",
 		"Scene",
 		"Renderer",
@@ -19,7 +20,10 @@
 		"Clock",
 		"Controller",
 		"View",
-		"Terminal"
+		"Terminal",
+		"Reload",
+		"RightMenu",
+		"RightButton"
 	],
 	"disabled": []
 }

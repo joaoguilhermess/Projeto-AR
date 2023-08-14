@@ -1,13 +1,15 @@
-class LeftItem {
-	constructor() {
-		AR.LeftMenu.addItem(this);
+class RightButton {
+	constructor(menu) {
+		this.menu = menu;
 
-		this.y = 0.0065;
+		this.menu.addButton(this);
+
+		this.y = 0.01;
 
 		this.addParent();
 
 		this.addTitle();
-		
+
 		this.addText();
 	}
 
@@ -16,7 +18,7 @@ class LeftItem {
 
 		parent.position.set(0, (this.slot + 1) * -this.y, 0);
 
-		AR.LeftMenu.parent.add(parent);
+		this.menu.parent.add(parent);
 
 		this.parent = parent;
 	}
@@ -36,7 +38,7 @@ class LeftItem {
 			color: AR.Palette.TextVeryDark
 		});
 
-		text.position.set(this.y/2, 0, 0);
+		text.position.set(-this.menu.x + this.y/2, 0, 0);
 
 		this.parent.add(text);
 
@@ -64,7 +66,7 @@ class LeftItem {
 			color: AR.Palette.Text
 		});
 
-		text.position.set(AR.LeftMenu.x - this.y/2, 0, 0);
+		text.position.set(-this.y/2, 0, 0);
 
 		this.parent.add(text);
 
@@ -78,4 +80,4 @@ class LeftItem {
 	}
 }
 
-AR.LeftItem = LeftItem;
+AR.RightButton = RightButton;

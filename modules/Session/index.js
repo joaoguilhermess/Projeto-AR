@@ -4,6 +4,8 @@ navigator.xr.isSessionSupported("immersive-vr").then(function(status) {
 			if (!AR.Session) {
 				var session = await navigator.xr.requestSession("immersive-vr");
 
+				console.log(session);
+
 				AR.Renderer.xr.setSession(session);
 
 				AR.Session = session;
