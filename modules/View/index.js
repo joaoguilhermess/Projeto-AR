@@ -41,6 +41,8 @@ class View {
 		this.addCanvas();
 
 		this.addRight();
+
+		this.addZoom();
 	}
 
 	static async addSource() {
@@ -48,10 +50,10 @@ class View {
 			navigator.getUserMedia({
 				video: {
 					facingMode: "environment",
-					height: 2160/8,
-					width: 4096/8
+					height: 2160/2,
+					width: 4096/2
 				}, audio: false
-			}, resolve, reject);
+			}, resolve, resolve);
 		});
 
 		var source = document.createElement("video");
@@ -109,40 +111,126 @@ class View {
 
 	static addRight() {
 		var menu = new AR.RightMenu();
+		this.rightMenu = menu;
+	}
 
-		var button = new AR.RightButton(menu);
+	static addZoom() {
+		var slider = new AR.RightSlider(this.rightMenu);
+		
+		slider.setTitle("Zoom:");
+		slider.setText("0%");
 
-		button.setTitle("banana");
-		button.setText("90%");
+		var track = this.source.srcObject.getTracks()[0];
+
+		var capabilities = track.getCapabilities();
+
+		slider.setCallback(function(value) {
+			slider.setText((value * 100).toFixed(0) + "%");
+
+			if (capabilities.zoom) {
+				track.applyConstraints({
+					advanced: [{
+						zoom: (capabilities.zoom.max * value)
+					}]
+				});
+			}
+		});
+	}
+
+	static addFlash() {
+		var slider = new AR.RightSlider(this.rightMenu);
+
+		slider.setTitle("Flash:");
+		slider.setText("OFF");
+
+		var track = this.source.srcObject.getTracks()[0];
+
+		var capabilities = track.getCapabilities();
+
+		console.log(capabilities);
+
+		slider.setCallback(function(value) {
+			if (value < 0.5) {
+				slider.setText("ON");
+
+				if (capabilities.zoom) {
+					track.applyConstraints({
+						advanced: [{
+							torch: true
+						}]
+					});
+				}
+			} else {
+				slider.setText("OFF");
+
+				if (capabilities.zoom) {
+					track.applyConstraints({
+						advanced: [{
+							torch: false
+						}]
+					});
+				}
+			}
+		});
 	}
 
 	static Focus() {
 		var context = this;
 
 		AR.Controller.setFocus(function(event) {
-			// context.parent.visible = true;
+			context.rightMenu.parent.visible = true;
 
-			// if (Math.abs(event.x) < 1/3 && event.y > 0) {
-			// 	if (event.type == "move") {
-			// 		context.take.material.color.setHex(AR.Palette.PrimaryDark);
-			// 	} else if (event.type == "end") {
-			// 		context.takePhoto();
+			for (var i = 0; i < context.rightMenu.items.length; i++) {
+				context.rightMenu.items[i].setHover(false);
+			}
 
-			// 		if (context.take.material.timeout) {
-			// 			clearTimeout(context.take.material);
-			// 		}
+			if (event.type == "move") {
+				if (event.x > 0) {
+					var y = (event.y + 1) / 2;
 
-			// 		context.take.material.timeout = setTimeout(function() {
-			// 			context.take.material.color.setHex(AR.Palette.Primary);
-			// 		}, 100);
-			// 	}
-			// } else {
-			// 	context.take.material.color.setHex(AR.Palette.Primary);
-			// }
+					var slot = Math.floor(y * context.rightMenu.items.length);
+
+					if (context.rightMenu.items[slot]) {
+						var item = context.rightMenu.items[slot];
+
+						item.setHover(true);
+					}
+				} else {
+					if (context.rightMenu.active) {
+						var y = (event.y + 1) / 2;
+
+						y = Math.floor(y * 100) / 100;
+
+						y -= 0.1;
+
+						y *= 1.2;
+
+						if (y > 1) {
+							context.rightMenu.active.update(1);
+						} else if (y > 0) {
+							context.rightMenu.active.update(y);
+						} else {
+							context.rightMenu.active.update(0);
+						}
+					}
+				}
+			} else if (event.type == "end") {
+				if (event.x > 0) {
+					var y = (event.y + 1) / 2;
+
+					var slot = Math.floor(y * context.rightMenu.items.length);
+
+					if (context.rightMenu.items[slot]) {
+						var item = context.rightMenu.items[slot];
+
+						context.rightMenu.setActive(item);
+					}
+				}
+			}
 		});
 
 		AR.Controller.setUnFocus(function() {
-			// context.parent.visible = true;
+			context.rightMenu.parent.visible = false;
 		});
 	}
 

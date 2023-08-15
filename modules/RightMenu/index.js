@@ -2,7 +2,7 @@ class RightMenu {
 	constructor() {
 		this.x = 0.045;
 
-		this.buttons = [];
+		this.items = [];
 
 		this.addParent();
 
@@ -19,14 +19,10 @@ class RightMenu {
 		this.parent = parent;
 	}
 
-	toggle() {
-		this.parent.visible = !this.parent.visible;
-	}
-
 	addBackground() {
 		var shape = new THREE.Shape();
 
-		var y = (this.buttons.length + 2) * 0.007;
+		var y = (this.items.length + 1) * 0.01;
 
 		shape.lineTo(-this.x, 0);
 		shape.lineTo(-this.x, -y);
@@ -57,13 +53,23 @@ class RightMenu {
 		this.background.material.dispose();
 	}
 
-	addButton(button) {
-		button.slot = this.buttons.length;
+	addItem(item) {
+		item.slot = this.items.length;
 
-		this.buttons.push(button);
+		this.items.push(item);
 
 		this.removeBackground();
 		this.addBackground();
+	}
+
+	setActive(item, active) {
+		if (this.active) {
+			this.active.setActive(false);
+		}
+
+		item.setActive(true);
+
+		this.active = item;
 	}
 }
 

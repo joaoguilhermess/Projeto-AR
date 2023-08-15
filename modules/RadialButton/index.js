@@ -11,7 +11,7 @@ class RadialButton {
 
 		this.r = AR.RadialMenu.r;
 
-		this.wB = 0.96;
+		this.wB = 1.04;
 		this.wT = 0.7;
 
 		this.active = false;

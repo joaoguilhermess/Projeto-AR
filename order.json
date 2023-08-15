@@ -1,6 +1,8 @@
 {
 	"enabled": [
 		"Constants",
+		"SocketIO",
+		"Log",
 		"Cache",
 		"Proxy",
 		"Viewer",
@@ -10,7 +12,6 @@
 		"Camera",
 		"Loop",
 		"Session",
-		"SocketIO",
 		"RadialMenu",
 		"RadialButton",
 		"LeftMenu",
@@ -23,7 +24,7 @@
 		"Terminal",
 		"Reload",
 		"RightMenu",
-		"RightButton"
+		"RightSlider"
 	],
 	"disabled": []
 }
