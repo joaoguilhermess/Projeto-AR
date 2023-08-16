@@ -14,6 +14,10 @@ export function Init() {
 		var stream = Util.writeStream(path);
 
 		req.pipe(stream);
+
+		req.on("end", function() {
+			res.sendStatus(200);
+		});
 	});
 }
 

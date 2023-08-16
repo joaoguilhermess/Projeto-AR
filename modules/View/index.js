@@ -43,6 +43,8 @@ class View {
 		this.addRight();
 
 		this.addZoom();
+
+		this.addTake();
 	}
 
 	static async addSource() {
@@ -50,8 +52,8 @@ class View {
 			navigator.getUserMedia({
 				video: {
 					facingMode: "environment",
-					height: 2160/2,
-					width: 4096/2
+					height: 2160/8,
+					width: 4096/8
 				}, audio: false
 			}, resolve, resolve);
 		});
@@ -137,40 +139,19 @@ class View {
 		});
 	}
 
-	static addFlash() {
+	static addTake() {
 		var slider = new AR.RightSlider(this.rightMenu);
 
-		slider.setTitle("Flash:");
-		slider.setText("OFF");
+		slider.setTitle("Take:");
 
-		var track = this.source.srcObject.getTracks()[0];
-
-		var capabilities = track.getCapabilities();
-
-		console.log(capabilities);
+		var context = this;
 
 		slider.setCallback(function(value) {
-			if (value < 0.5) {
-				slider.setText("ON");
-
-				if (capabilities.zoom) {
-					track.applyConstraints({
-						advanced: [{
-							torch: true
-						}]
-					});
-				}
-			} else {
-				slider.setText("OFF");
-
-				if (capabilities.zoom) {
-					track.applyConstraints({
-						advanced: [{
-							torch: false
-						}]
-					});
-				}
-			}
+			slider.setText("...");
+			
+			context.takePhoto().then(function() {
+				slider.setText("");
+			});
 		});
 	}
 
@@ -195,6 +176,18 @@ class View {
 
 						item.setHover(true);
 					}
+				}
+			} else if (event.type == "end") {
+				if (event.x > 0) {
+					var y = (event.y + 1) / 2;
+
+					var slot = Math.floor(y * context.rightMenu.items.length);
+
+					if (context.rightMenu.items[slot]) {
+						var item = context.rightMenu.items[slot];
+
+						context.rightMenu.setActive(item);
+					}
 				} else {
 					if (context.rightMenu.active) {
 						var y = (event.y + 1) / 2;
@@ -214,18 +207,6 @@ class View {
 						}
 					}
 				}
-			} else if (event.type == "end") {
-				if (event.x > 0) {
-					var y = (event.y + 1) / 2;
-
-					var slot = Math.floor(y * context.rightMenu.items.length);
-
-					if (context.rightMenu.items[slot]) {
-						var item = context.rightMenu.items[slot];
-
-						context.rightMenu.setActive(item);
-					}
-				}
 			}
 		});
 
@@ -234,13 +215,17 @@ class View {
 		});
 	}
 
-	static takePhoto() {
+	static async takePhoto() {
 		this.canvas.context.drawImage(this.source, 0, 0, this.source.videoWidth, this.source.videoHeight);
 
-		this.canvas.toBlob(function(blob) {
-			fetch("/photos", {
-				method: "POST",
-				body: blob
+		var context = this;
+
+		return await new Promise(function(resolve, reject) {
+			context.canvas.toBlob(function(blob) {
+				fetch("/photos", {
+					method: "POST",
+					body: blob
+				}).then(resolve);
 			});
 		});
 	}

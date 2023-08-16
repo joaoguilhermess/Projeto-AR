@@ -1,9 +1,11 @@
 class Terminal {
 	static Init() {
-		this.x = 1;
-		this.y = 0.65;
+		this.x = 1 * 0.15;
+		this.y = 0.65 * 0.15;
 
-		this.rows = 25;
+		this.f = 0.0125;
+
+		this.rows = 15;
 		this.columns = 0;
 
 		this.prefix = "> ";
@@ -132,10 +134,10 @@ class Terminal {
 				}
 
 				context.std.sync(function() {
-					var r = context.std.geometry.boundingBox.getSize(new THREE.Vector3()).y/0.05;
+					var r = context.std.geometry.boundingBox.getSize(new THREE.Vector3()).y/context.f;
 
 					if (r > context.rows) {
-						context.std.anchorY = -(r - context.rows) * 0.05;
+						context.std.anchorY = -(r - context.rows) * context.f;
 					} else {
 						context.std.anchorY = 0;
 					}
@@ -193,7 +195,7 @@ class Terminal {
 	static addStd() {
 		var text = new TroikaText();
 
-		text.fontSize = 0.05;
+		text.fontSize = this.f;
 		text.textAlign = "left";
 
 		text.anchorX = "left";
@@ -205,7 +207,7 @@ class Terminal {
 		text.letterSpacing = 0;
 		text.lineHeight = 1;
 
-		text.clipRect = [0, text.fontSize * -this.rows, 2, 0];
+		text.clipRect = [0, text.fontSize * -this.rows, this.x, 0];
 
 		text.font = "/resources/fonts/RobotoMono/RobotoMono-Medium.ttf";
 
@@ -215,7 +217,7 @@ class Terminal {
 
 		text.position.set(-this.x + text.fontSize/3, this.y - text.fontSize/3, 0);
 
-		text.maxWidth = 2;
+		text.maxWidth = this.x;
 
 		text.sync();
 
