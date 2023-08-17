@@ -132,7 +132,7 @@ class View {
 			if (capabilities.zoom) {
 				track.applyConstraints({
 					advanced: [{
-						zoom: (capabilities.zoom.max * value)
+						zoom: Math.floor((Math.floor((capabilities.zoom.max - capabilities.zoom.min) * value / capabilities.zoom.step) * capabilities.zoom.step + capabilities.zoom.min) * 100) / 100
 					}]
 				});
 			}
